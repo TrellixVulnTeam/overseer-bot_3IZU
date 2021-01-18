@@ -94,6 +94,10 @@ async def ban_error(ctx, error):
         await ctx.send(" :x: You do not have the required permissions to use that.")
     elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(":x: You forgot to mention the user you'd like to ban.")
-api_key = '34a9fdca0eaadb711592e297787268f1'
-base_url = 'http://api.openweathermap.org/data/2.5/weather?'
-client.run('Nzg0MjA2Nzg5NjU4NDExMDg4.X8l7fA.SzOBipWnj8k8L8nAVEv4NjmebGc')
+
+# OpenWeatherMap
+#api_key = '#'
+#base_url = 'http://api.openweathermap.org/data/2.5/weather?'
+
+#Discord Login
+client.run('TOKEN')
