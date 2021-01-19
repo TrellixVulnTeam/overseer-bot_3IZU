@@ -1,10 +1,12 @@
+import asyncio
+import json
+import random
+import os
+
 import discord
+import requests
 from discord.ext import commands
 from discord.ext.commands import CommandNotFound
-import asyncio
-import requests
-import random
-import json
 
 client = commands.Bot(command_prefix = '$')
 
@@ -14,10 +16,22 @@ async def on_ready():
     activity=discord.Game("with my creator's feelings."))
     print('Logged into Discord API.')
 
-@client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, CommandNotFound):
-        await ctx.send(":x: That command doesn't exist!")
+#@client.event
+#async def on_command_error(ctx, error):
+#    if isinstance(error, CommandNotFound):
+#        await ctx.send(":x: That command doesn't exist!")
+
+@client.command()
+async def load(ctx, extension):
+    client.load_extension(f'cogs.{extension}')
+
+@client.command()
+async def unload(ctx, extension):
+    client.unload_extension(f'cogs.{extension}')
+
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        client.load_extension(f'cogs.{filename[:-3]}')
 
 @client.command(aliases = ['hi'])
 async def hello(ctx):
@@ -52,62 +66,6 @@ async def _8ball(ctx, *, question):
 async def _8ball_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(":x: Ask me a question first!")
-
-# Administrator commands
-
-#role creation
-@client.command
-@commands.has_permissions(manage_roles = True)
-async def makerole(ctx, *, name):
-    guild = ctx.guild
-    await guild.create_role(name=name)
-    await ctx.send(f"{name} has been created!")
-
-# clear command and error handle
-@client.command(aliases = ['purge'])
-@commands.has_permissions(manage_messages = True)
-async def clear(ctx, amount = 2):
-    await ctx.channel.purge(limit = amount)
-    await ctx.send(f'cleared {amount} messages')
-
-@clear.error
-async def clear_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send(" :x: You do not have the required permissions to use that.")
-
-# kick command and error handle
-@client.command(aliases = ['boot'])
-@commands.has_permissions(kick_members = True)
-async def kick(ctx, member: discord.Member, *, Reason = None):
-    await ctx.guild.kick(member) #client.kick and ctx.kick are no longer supported;
-    await ctx.send(f':boot: {member} has been kicked from the server!')
-
-@kick.error
-async def kick_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send(" :x: You do not have the required permissions to use that.")
-    elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(":x: You forgot to mention the user you'd like to kick.")
-
-# ban command and error handle
-@client.command(aliases = ['banish', 'begone'])
-@commands.has_permissions(ban_members = True)
-async def ban(ctx, member: discord.Member, *, Reason = None):
-    await ctx.guild.ban(member) #client.ban and ctx.ban are no longer supported
-    await ctx.send(f':hammer_pick: {member} has been banned from the server!')
-
-@ban.error
-async def ban_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send(" :x: You do not have the required permissions to use that.")
-    elif isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(":x: You forgot to mention the user you'd like to ban.")
-
-@client.command(aliases = ['silence'])
-@commands.has_permissions(mute_members = True)
-async def mute(ctx, member: discord.Member, *, Reason = None):
-    await ctx.guild.mute(member)
-    await ctx.send(f':mute: {member} has been muted!')
 
 # OpenWeatherMap
 #api_key = '#'
